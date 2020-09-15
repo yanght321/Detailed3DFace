@@ -1,7 +1,8 @@
 # Detailed Riggable 3D Face Prediction
 **[[Arxiv]](https://arxiv.org/abs/2003.13989)**
-<img src="https://github.com/yanght321/Detailed3DFace/teaser/1.png" >
-<img src="https://github.com/yanght321/Detailed3DFace/teaser/2.png" >
+
+<img src="https://github.com/yanght321/Detailed3DFace/teaser/1.PNG" >
+<img src="https://github.com/yanght321/Detailed3DFace/teaser/2.PNG" >
 
 ## Requirements
 - The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0.  
