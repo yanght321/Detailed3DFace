@@ -29,7 +29,7 @@ python main.py --name dpmap_single --input ./demo/input --output ./demo/output -
 ```
 The results will be saved in the folder './demo/output/'. Displacement maps can be loaded and visualized in MAYA, ZBrush, 3D MAX, etc. The results in our paper is rendered in ZBrush and the scale is set to 0.014.
 
-You can set '--name dpmap_rig' to predict displacement maps corresponding to 20 key expressions. The input image should be in nearly neutral expression for this option.
+You can set '--name dpmap_rig' to predict displacement maps corresponding to the 20 key expressions. The input image should be in nearly neutral expression for this option.
 
 Note that the base model fitting results may be different from that in our paper, because our landmark detector cannot be released due to the licenses. So we used the publicly available dlib detector as 
 substituent and simplified the fitting algorithm.
