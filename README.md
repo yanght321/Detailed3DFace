@@ -2,7 +2,7 @@
 **[[Arxiv]](https://arxiv.org/abs/2003.13989)**
 
 <img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/1.PNG" >
-<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/1.PNG" >
+<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/2.PNG" >
 
 ## Requirements
 - The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0.  
