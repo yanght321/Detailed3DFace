@@ -9,9 +9,10 @@ class Options():
     def initialize(self):
         # experiment specifics
         self.parser.add_argument('--name', type=str, default='dpmap_single',
-                                 help='name of the experiment. It decides where to store samples and models')
+                                 help='"dpmap_single":predicting the displacemnt map for the source image. "dpmap_rig":predicting the displacemnt map for 20 key expressions.')
         self.parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
-        self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
+        self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints',
+                                 help='pretrained models are saved here')
         self.parser.add_argument('--predef_dir', type=str, default='./predef', help='predefined files are saved here')
         self.parser.add_argument('--input', type=str, required=True, help='input dir')
         self.parser.add_argument('--output', type=str, required=True, help='output dir')
@@ -41,3 +42,4 @@ class Options():
             print('%s: %s' % (str(k), str(v)))
         print('-------------- End ----------------')
         return self.opt
+
