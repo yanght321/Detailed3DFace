@@ -6,7 +6,7 @@
 
 ## Requirements
 - The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0.  
-- Blilinear model from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) is required.  You can download the bilinear model after submitting an application.
+- Bilinear model from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) is required.  You can download the bilinear model after submitting an application.
 
 ## Usage
 1. We recomend using [Anaconda](https://www.anaconda.com/download/#linux) to create a new enviroment:
