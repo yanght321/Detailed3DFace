@@ -1,6 +1,5 @@
 ### Copyright (C) 2017 NVIDIA Corporation. All rights reserved. 
 ### Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
-import numpy as np
 import torch
 from torch.autograd import Variable
 from .base_model import BaseModel

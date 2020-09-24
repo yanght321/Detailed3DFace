@@ -1,7 +1,6 @@
-import glob
 from bilinear_model import BilinearModel
 import cv2
-from utils import color_transfer, tensor2im
+from utils import color_transfer, tensor2im, subdiv, dpmap2verts
 import numpy as np
 import os
 from options import Options
@@ -21,6 +20,10 @@ def main():
 
     bilinear_model = BilinearModel(opt.predef_dir)
 
+    if opt.render:
+        from renderer import MeshRenderer
+        renderer = MeshRenderer()
+
     if opt.name == 'dpmap_rig':
         opt.input_nc = 6
         pos_maps = np.load(f'{opt.predef_dir}/posmaps.npz')
@@ -36,9 +39,14 @@ def main():
             os.mkdir(f'{opt.output}/{base_name}')
 
         img = cv2.imread(f'{opt.input}/{img_name}')
+
+        print('Fitting 3DMM Parameters...')
         proj_params, verts = bilinear_model.fit_image(img)
-        texture = bilinear_model.get_texture(img, proj_params, verts)
-        bilinear_model.save_obj(f'{opt.output}/{base_name}/{base_name}.obj', verts, f'./{base_name}.jpg')
+
+        print('Warping texture...')
+        verts_img = bilinear_model.project(verts, *proj_params, keepz=False)
+        texture = bilinear_model.get_texture(img, verts_img)
+        bilinear_model.save_obj(f'{opt.output}/{base_name}/{base_name}.obj', verts, f'./{base_name}.jpg', front=True)
         cv2.imwrite(f'{opt.output}/{base_name}/{base_name}.jpg', texture)
 
         texture = cv2.resize(texture[600:2500, 1100:3000], (1024, 1024)).astype(np.uint8)
@@ -70,6 +78,17 @@ def main():
             dpmap = Image.fromarray(dpmap)
             dpmap_full.paste(dpmap, (1100, 600, 3000, 2500))
             dpmap_full.save(f'{opt.output}/{base_name}/{base_name}_dpmap.png')
+            if opt.render:
+                print('Rendering results...')
+                front_verts = verts[bilinear_model.front_verts_indices]
+                tris, vert_texcoords = bilinear_model.tris.copy(), bilinear_model.vert_texcoords.copy()
+                for _ in range(3):
+                    front_verts, tris, vert_texcoords = subdiv(front_verts, tris, vert_texcoords)
+                front_verts = dpmap2verts(front_verts, tris, vert_texcoords, dpmap_full)
+
+                verts_img = bilinear_model.project(front_verts, *proj_params, keepz=True)
+                renderer.render(verts_img, tris, (img.shape[1], img.shape[0]), f'{opt.input}/{img_name}',
+                                f'{opt.output}/{base_name}/{base_name}_render.jpg')
 
 
 if __name__ == '__main__':

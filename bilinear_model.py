@@ -20,6 +20,12 @@ class BilinearModel():
 
         with open(f'{model_dir}/faces.pkl', 'rb') as f:
             self.texcoords, self.faces = pickle.load(f)
+        with open(f'{model_dir}/front_verts_indices.pkl', 'rb') as f:
+            self.front_verts_indices = pickle.load(f)
+        with open(f'{model_dir}/front_texcoords.pkl', 'rb') as f:
+            self.front_texcoords = pickle.load(f)
+        with open(f'{model_dir}/front_faces.pkl', 'rb') as f:
+            self.front_faces = pickle.load(f)
 
         with open(f'{model_dir}/id_mean.pkl', 'rb') as f:
             self.id_mean = pickle.load(f)
@@ -27,10 +33,11 @@ class BilinearModel():
             self.id_var = pickle.load(f)
         with open(f'{model_dir}/exp_GMM.pkl', 'rb') as f:
             self.exp_gmm = pickle.load(f)
+        with open(f'{model_dir}/front_faces.pkl', 'rb') as f:
+            self.front_faces = pickle.load(f)
 
         with open(f'{model_dir}/contour_line_68.pkl', 'rb') as f:
             self.contour_line_right, self.contour_line_left = pickle.load(f)
-
         self.core_tensor = np.load(f'{model_dir}/core_847_50_52.npy')
         self.factors_id = np.load(f'{model_dir}/factors_id_847_50_52.npy')
 
@@ -44,8 +51,17 @@ class BilinearModel():
         self.detector = dlib.get_frontal_face_detector()
         self.points = dlib.shape_predictor('./dlib/shape_predictor_68_face_landmarks.dat')
 
+        # for render
+        tris = []
+        self.vert_texcoords = np.zeros((len(self.front_verts_indices), 2))
+        for face in self.front_faces:
+            vertices, normals, texture_coords, material = face
+            tris.append([vertices[0] - 1, vertices[1] - 1, vertices[2] - 1])
+            for i in range(len(vertices)):
+                self.vert_texcoords[vertices[i] - 1] = self.front_texcoords[texture_coords[i] - 1]
+        self.tris = np.array(tris)
+
     def fit_image(self, img):
-        print('Fitting 3DMM Parameters...')
         w = img.shape[1]
         h = img.shape[0]
         scale = max(w, h) / 512
@@ -66,13 +82,13 @@ class BilinearModel():
         scale = 1
 
         mesh_vertices = self.core_tensor.dot(id).dot(exp).reshape((-1, 3))
-        verts_2d = self._project(mesh_vertices, rot_vector, scale, trans)
+        verts_img = self.project(mesh_vertices, rot_vector, scale, trans)
         lm_index = self.lm_index
 
         for optimize_loop in range(4):
 
-            vertices_mean = np.mean(verts_2d[lm_index], axis=0)
-            vertices_2d = verts_2d[lm_index] - vertices_mean
+            vertices_mean = np.mean(verts_img[lm_index], axis=0)
+            vertices_2d = verts_img[lm_index] - vertices_mean
             lm_index_full = np.zeros(self.num_lm * 3, dtype=int)
             for i in range(self.num_lm * 3):
                 lm_index_full[i] = lm_index[i // 3] * 3 + i % 3
@@ -90,9 +106,9 @@ class BilinearModel():
             exp = self._optimize_expression(scale, trans, rot_vector, id, exp, lm_core_tensor, lm_pos, prior_weight=1)
 
             mesh_vertices = self.core_tensor.dot(id).dot(exp).reshape((-1, 3))
-            verts_2d = self._project(mesh_vertices, rot_vector, scale, trans)
+            verts_img = self.project(mesh_vertices, rot_vector, scale, trans)
 
-            lm_index = self._update_3d_lm_index(verts_2d, lm_index)
+            lm_index = self._update_3d_lm_index(verts_img, lm_index)
 
         return (rot_vector, scale, trans), mesh_vertices
 
@@ -118,10 +134,13 @@ class BilinearModel():
 
         return updated_lm_index
 
-    def _project(self, points, rot_vec, scale, trans):
+    def project(self, points, rot_vec, scale, trans, keepz=False):
         points_proj = self._rotate(points, rot_vec.reshape(1, 3))
         points_proj = points_proj * scale
-        points_proj = points_proj[:, 0:2] + trans
+        if keepz:
+            points_proj[:, 0:2] = points_proj[:, 0:2] + trans
+        else:
+            points_proj = points_proj[:, 0:2] + trans
         return points_proj
 
     def _rotate(self, points, rot_vec):
@@ -148,7 +167,7 @@ class BilinearModel():
     def _compute_res_id(self, id, id_matrix, scale, trans, rot_vector, lm_pos, prior_weight):
         id_matrix = id_matrix.reshape(-1, id.shape[0])
         lm_pos_3D = id_matrix.dot(id).reshape((-1, 3))
-        lm_proj = self._project(lm_pos_3D, rot_vector, scale, trans).ravel()
+        lm_proj = self.project(lm_pos_3D, rot_vector, scale, trans).ravel()
         return np.linalg.norm(lm_proj - lm_pos) ** 2 / scale / scale + prior_weight * (id - self.id_mean).dot(
             np.diag(1 / self.id_var)).dot(np.transpose([id - self.id_mean]))
 
@@ -164,7 +183,7 @@ class BilinearModel():
         exp_full = np.ones(52)
         exp_full[1:52] = exp
         lm_pos_3D = exp_matrix.dot(exp_full).reshape((-1, 3))
-        lm_proj = self._project(lm_pos_3D, rot_vector, scale, trans).ravel()
+        lm_proj = self.project(lm_pos_3D, rot_vector, scale, trans).ravel()
 
         return np.linalg.norm(lm_proj - lm_pos) ** 2 / scale / scale - prior_weight * \
                self.exp_gmm.score_samples(exp.reshape(1, -1))[0]
@@ -183,13 +202,11 @@ class BilinearModel():
 
     def _compute_res_rigid(self, params, lm_pos_3D, lm_pos):
         lm_pos_3D = lm_pos_3D.reshape(-1, 3)
-        lm_proj = self._project(lm_pos_3D, params[3:6], params[0], params[1:3])
+        lm_proj = self.project(lm_pos_3D, params[3:6], params[0], params[1:3])
         return lm_proj.ravel() - lm_pos
 
-    def get_texture(self, img, proj_params, verts):
-        print('Warping texture...')
+    def get_texture(self, img, verts_img):
         h, w, _ = img.shape
-        verts_2d = self._project(verts, *proj_params)
 
         texture = np.zeros((4096, 4096, 3))
 
@@ -205,12 +222,12 @@ class BilinearModel():
                    abs(self.texcoords[tc[1] - 1][1] - self.texcoords[tc[2] - 1][1])) > 0.3:
                 continue
 
-            tri1 = np.float32([[[(h - int(verts_2d[ver_indices[0] - 1, 1])),
-                                 int(verts_2d[ver_indices[0] - 1, 0])],
-                                [(h - int(verts_2d[ver_indices[1] - 1, 1])),
-                                 int(verts_2d[ver_indices[1] - 1, 0])],
-                                [(h - int(verts_2d[ver_indices[2] - 1, 1])),
-                                 int(verts_2d[ver_indices[2] - 1, 0])]]])
+            tri1 = np.float32([[[(h - int(verts_img[ver_indices[0] - 1, 1])),
+                                 int(verts_img[ver_indices[0] - 1, 0])],
+                                [(h - int(verts_img[ver_indices[1] - 1, 1])),
+                                 int(verts_img[ver_indices[1] - 1, 0])],
+                                [(h - int(verts_img[ver_indices[2] - 1, 1])),
+                                 int(verts_img[ver_indices[2] - 1, 0])]]])
             tri2 = np.float32(
                 [[[4096 - self.texcoords[tc[0] - 1][1] * 4096, self.texcoords[tc[0] - 1][0] * 4096],
                   [4096 - self.texcoords[tc[1] - 1][1] * 4096, self.texcoords[tc[1] - 1][0] * 4096],
@@ -249,17 +266,24 @@ class BilinearModel():
 
         return texture
 
-    def save_obj(self, path, verts, texture_name=None):
+    def save_obj(self, path, verts, texture_name=None, front=False):
+        if front:
+            verts = verts[self.front_verts_indices]
+            faces = self.front_faces
+            texcoords = self.front_texcoords
+        else:
+            faces = self.faces
+            texcoords = self.texcoords
         with open(path, 'w') as f:
             if texture_name is not None:
                 f.write('mtllib ./%s.mtl\n' % path.split('/')[-1])
             for i in range(len(verts)):
                 f.write("v %.6f %.6f %.6f\n" % (verts[i][0], verts[i][1], verts[i][2]))
-            for i in range(len(self.texcoords)):
-                f.write("vt %.6f %.6f\n" % (self.texcoords[i][0], self.texcoords[i][1]))
+            for i in range(len(texcoords)):
+                f.write("vt %.6f %.6f\n" % (texcoords[i][0], texcoords[i][1]))
             if texture_name is not None:
                 f.write('usemtl material_0\n')
-            for face in self.faces:
+            for face in faces:
                 face_vertices, face_normals, face_texture_coords, material = face
                 f.write("f %d/%d %d/%d %d/%d\n" % (
                     face_vertices[0], face_texture_coords[0], face_vertices[1], face_texture_coords[1],

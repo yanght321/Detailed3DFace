@@ -19,6 +19,8 @@ class Options():
         # input/output sizes
         self.parser.add_argument('--batchSize', type=int, default=1, help='input batch size')
         self.parser.add_argument('--input_nc', type=int, default=3, help='# of input image channels')
+        self.parser.add_argument("--render", action='store_true',
+                                 help="if specified, render result to the source image")
 
     def parse(self):
         self.initialize()
@@ -42,4 +44,3 @@ class Options():
             print('%s: %s' % (str(k), str(v)))
         print('-------------- End ----------------')
         return self.opt
-
