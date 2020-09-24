@@ -1,11 +1,12 @@
 # Detailed Riggable 3D Face Prediction
-**[[Arxiv]](https://arxiv.org/abs/2003.13989)**
-<img src="https://github.com/yanght321/Detailed3DFace/teaser/1.png" >
-<img src="https://github.com/yanght321/Detailed3DFace/teaser/2.png" >
+**[[Project Page]](https://facescape.nju.edu.cn/)** &nbsp; &nbsp;**[[Arxiv]](https://arxiv.org/abs/2003.13989)**
+
+<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/1.PNG" >
+<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/2.PNG" >
 
 ## Requirements
 - The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0.  
-- Blilinear model from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) is required.  You can download the bilinear model after submitting an application.
+- Bilinear model from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) is required.  You can download the bilinear model after submitting an application.
 
 ## Usage
 1. We recomend using [Anaconda](https://www.anaconda.com/download/#linux) to create a new enviroment:
