@@ -27,9 +27,9 @@ Refer to the [guide](https://pytorch.org/get-started/locally/) to install the Py
 
 4. Run the demo code.
 ```
-python main.py --name dpmap_single --input ./demo/input --output ./demo/output --gpu_ids 0
+python main.py --name dpmap_single --input ./demo/input --output ./demo/output --gpu_ids 0 --render
 ```
-The results will be saved in the folder './demo/output/'. Displacement maps can be loaded and visualized in MAYA, ZBrush, 3D MAX, etc. The results in our paper is rendered in ZBrush and the scale is set to 0.014.
+The results will be saved in the folder './demo/output/'. Run "python main.py -h" for more usages. We provide a simple renderer to visualize the result in the demo. Displacement maps can also be loaded and visualized in MAYA, ZBrush, 3DS MAX, etc. The results in our paper is rendered in ZBrush and the scale is set to 0.014.
 
 You can set '--name dpmap_rig' to predict displacement maps corresponding to the 20 key expressions. The input image should be in nearly neutral expression for this option.
 
