@@ -118,7 +118,7 @@ def subdiv(verts, tris, texcoords=None, face_index=None):
 
 
 def dpmap2verts(verts, tris, texcoords, dpmap, scale=0.914):
-    dpmap = np.array(dpmap)
+    dpmap = np.array(dpmap).astype(int)
     normals = np.zeros(verts.shape)
     tri_verts = verts[tris]
     n0 = np.cross(tri_verts[::, 1] - tri_verts[::, 0], tri_verts[::, 2] - tri_verts[::, 0])
@@ -129,7 +129,7 @@ def dpmap2verts(verts, tris, texcoords, dpmap, scale=0.914):
         normals[tris[i, 2]] += n0[i]
     normals = normals / np.linalg.norm(normals, axis=1)[:, np.newaxis]
 
-    for i in range(verts.shape[0]):
-        verts[i] += normals[i] * (dpmap[dpmap.shape[0] - int(texcoords[i][1] * dpmap.shape[0]), int(
-            texcoords[i][0] * dpmap.shape[1])] - 32768) / 32768 * scale
+    pos_u = dpmap.shape[0] - (texcoords[:, 1] * dpmap.shape[0]).astype(int)
+    pos_v = (texcoords[:, 0] * dpmap.shape[1]).astype(int)
+    verts += normals * (dpmap[pos_u, pos_v] - 32768)[:, np.newaxis] / 32768 * scale
     return verts
