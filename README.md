@@ -1,12 +1,12 @@
 # Detailed Riggable 3D Face Prediction
-**[[Project Page]](https://facescape.nju.edu.cn/)** &nbsp; &nbsp;**[[Arxiv]](https://arxiv.org/abs/2003.13989)**
+**[[CVPR2020 Paper]](https://openaccess.thecvf.com/content_CVPR_2020/papers/Yang_FaceScape_A_Large-Scale_High_Quality_3D_Face_Dataset_and_Detailed_CVPR_2020_paper.pdf)**  &nbsp; &nbsp;**[[FaceScape dataset]](https://facescape.nju.edu.cn/)**
 
-<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/1.PNG" >
-<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/2.PNG" >
+<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/pred.jpg" >
+<img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/rig.jpg" >
 
 ## Requirements
-- The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0.  
-- Bilinear model from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) is required.  You can download the bilinear model after submitting an application.
+- The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0, torchvision 0.7.0.
+- Bilinear model can be downloaded from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) by applying the license key (for non-commercial research purpose only). Learn about FaceScape on [github page](https://github.com/zhuhao-nju/facescape.git).
 
 ## Usage
 1. We recomend using [Anaconda](https://www.anaconda.com/download/#linux) to create a new enviroment:
@@ -21,7 +21,7 @@ pip install -r requirements.txt
 ```
 Refer to the [guide](https://pytorch.org/get-started/locally/) to install the PyTorch 1.6.0.
 
-2. Download the Blilinear model from FaceScape dataset. After getting access to the dataset, download 'facescape_bilinear_model_v1_3.zip' from the download page. Then put 'core_847_50_52.npy' and 'factors_id_847_50_52.npy' into './predef' folder.
+2. Download the bilinear model from FaceScape dataset. After getting access to the dataset, download 'facescape_bilinear_model_v1_3.zip' from the download page. Then put 'core_847_50_52.npy' and 'factors_id_847_50_52.npy' into './predef' folder.
 
 3. Download the pretrained model from [Google Drive](https://drive.google.com/file/d/18j8bnj5IHP0u2jNuIrWh7dvQkfagBxsM/view?usp=sharing), unzip the file and place 'dpmap_rig_net_G.pth' and 'dpmap_single_net_G.pth' in './checkpoints' folder.
 
