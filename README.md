@@ -1,12 +1,12 @@
 # Detailed Riggable 3D Face Prediction
-**[[CVPR2020 Paper]](https://openaccess.thecvf.com/content_CVPR_2020/papers/Yang_FaceScape_A_Large-Scale_High_Quality_3D_Face_Dataset_and_Detailed_CVPR_2020_paper.pdf)**  &nbsp; &nbsp;**[[FaceScape dataset]](https://facescape.nju.edu.cn/)**
+**[[CVPR2020 Paper]](https://openaccess.thecvf.com/content_CVPR_2020/papers/Yang_FaceScape_A_Large-Scale_High_Quality_3D_Face_Dataset_and_Detailed_CVPR_2020_paper.pdf)**  &nbsp; &nbsp;**[[FaceScape Dataset]](https://facescape.nju.edu.cn/)**
 
 <img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/pred.jpg" >
 <img src="https://github.com/yanght321/Detailed3DFace/blob/master/teaser/rig.jpg" >
 
 ## Requirements
 - The project is tested on ubuntu 18.04 with python 3.6, PyTorch 1.6.0, torchvision 0.7.0.
-- Bilinear model can be downloaded from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) by applying the license key (for non-commercial research purpose only). Learn about FaceScape on [github page](https://github.com/zhuhao-nju/facescape.git).
+- Bilinear model can be downloaded from [FaceScape dataset](https://facescape.nju.edu.cn/Page_Data/) by applying the license key (for non-commercial research only). Learn about FaceScape dataset on [github page](https://github.com/zhuhao-nju/facescape.git).
 
 ## Usage
 1. We recomend using [Anaconda](https://www.anaconda.com/download/#linux) to create a new enviroment:
